@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Hello World!</title>
+		<link href="index.css" rel="stylesheet" />
+	</head>
+	<body background="2.jpg">
+		<ul>
+			<li><a href="login.html">返回登录</a></li>
+			<li><a href="register.html">返回注册</a></li>
+		</ul>
+		<script type="text/javascript" src="index.js"></script>
+	</body>
+
+</html>
