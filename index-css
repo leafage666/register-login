@@ -1,0 +1,80 @@
+/*用户访问时候的样式*/
+#myDiv1 {
+	width: 660px;
+	height: 541px;
+	margin: auto auto auto auto;
+	margin-top: 100px;
+	margin-left: 100px;
+	float: left;
+}
+
+#myDiv2 {
+	background-color: #CCCCCC;
+	width: 660px;
+	height: 541px;
+	margin: auto auto auto auto;
+	margin-top: 100px;
+	margin-right: 100px;
+	float: right;
+	font-family: "微软雅黑";
+}
+table {
+	margin: auto;
+	border: 1px solid #669999;
+}
+caption {
+	margin: auto;
+	padding: 2.5em;
+	font-size: 2em;
+	font-weight: bold;
+}
+tr {
+	font-weight: normal;
+	font-style: italic;
+	text-align: left;
+	border: 1px dotted #669999;
+	background-color: #9cc;
+	color: #000000;
+}
+td {
+	width: 10em;
+	padding: 1em;
+}
+/*游客访问时候的样式*/
+#myDiv3 {
+	width: 660px;
+	height: 541px;
+	background-color: transparent;
+	margin: auto auto auto auto;
+	margin-top: 100px;
+}
+
+#title {
+	font-family: "微软雅黑";
+	font-size: larger;
+	padding-top: 100px;
+	color: red;
+	text-align: center;
+}
+
+#content {
+	font-family: "微软雅黑";
+	font-size: larger;
+	padding-top: 30px;
+	color: yellow;
+	text-align: center;
+}
+li {
+	float: left;
+	text-align: center;
+	color: #CCCCCC;
+	list-style: none;
+	width: 100px;
+	height: 20px;
+	position: relative;
+}
+
+a {
+	color: #99CCCC;
+	text-decoration: none;
+}
