@@ -38,6 +38,8 @@ function spanValue(spanID, spanValue) { //匹配失败时，修改后面字的�
 		case "phoneSpan":
 			spanID.firstChild.nodeValue = "号码格式不正确";
 			break;
+		case "usernameAgain":
+			spanID.firstChild.nodeValue = "用户名已存在！";
 	}
 }
 
@@ -45,22 +47,35 @@ function username() {
 	var username = document.getElementById("username"); //得到账户的对象
 	var usernameSpan = document.getElementById("usernameSpan"); //得到文本对象
 	var pattern = /^[0-9a-zA-Z_]{6,16}$/;
+	var userAgain = 0; //用来标记用户名是否存在，1为用户名不存在且输入正确
 	username.onfocus = function() { //获得焦点时根据匹配成功与否修改span中的样式和内容
 		if(!pattern.test(username.value)) { //如果获得焦点时输入不正确，重新调整样式
 			spanValue(usernameSpan, "usernameSpan"); //修改提示语句
 			changeFailingStyle(username, usernameSpan); //修改为匹配中并且失败的样式
+		} else {//如果匹配成功但是用户名存在
+			if(userAgain == 0) {
+				spanValue(usernameSpan, "usernameAgain"); //修改提示语句
+				changeFailingStyle(username, usernameSpan); //修改为匹配中并且失败的样式
+			}
 		}
 	}
 	username.onkeyup = function() { //输入内容是判断根据输入的值修改span中的样式和内容,使用up不是down，因为down读取时候有出入
 		if(pattern.test(username.value)) { //匹配成功的话
 			changeSucceedStyle(username, usernameSpan); //修改为匹配成功的样式
+			if(!checkUsername(username.value + "username")) {//如果用户名存在
+				spanValue(usernameSpan, "usernameAgain"); //修改提示语句
+				changeFailingStyle(username, usernameSpan); //修改为匹配中并且失败的样式
+				userAgain = 0; //修改为0
+			} else {
+				userAgain = 1; //修改为1
+			}
 		} else { //匹配失败
 			spanValue(usernameSpan, "usernameSpan"); //修改提示语句
 			changeFailingStyle(username, usernameSpan);
 		}
 	}
 	username.onblur = function() { //失去焦点时根据匹配成功与否修改span中的样式和内容
-		if(pattern.test(username.value)) { //匹配成功的话
+		if(pattern.test(username.value) && userAgain) { //匹配成功的话
 			changeSucceedStyle(username, usernameSpan); //修改为成功的样式
 			usernamenum = 1;
 		} else { //匹配失败
@@ -108,7 +123,7 @@ function password() {
 		} else {
 			if(password.value != repassword.value) {
 				repassword.onfocus();
-				repassword.style.borderColor = "red";
+				//repassword.style.borderColor = "red";
 				repasswordnum = 0;
 			}
 		}
@@ -126,7 +141,7 @@ function repassword() {
 		if(!(password.value == repassword.value && password.value != "")) { //如果两次密码的值不相等，修改内容和样式
 			spanValue(repasswordSpan, "repasswordSpan"); //修改提示语句
 			changeFailingStyle(repassword, repasswordSpan);
-		} else { //理论上不需要，但是有可能修改完密码后 与 此时的确认密码不同   然后又修改成相同的时候又用
+		} else { //是有可能修改完密码后 与 此时的确认密码不同   然后又修改成相同的时候又用
 			changeSucceedStyle(repassword, repasswordSpan);
 		}
 	}
@@ -213,7 +228,7 @@ function vercode() {
 	var vercodeSpan = document.getElementById("vercodeSpan");
 	vercode.onfocus = function() {
 		if(vercode.value == "" || vercodeSpan.style.color == "red" || vercodeSpan.style.color == "") { //如果内容为空点击产生验证码
-			produceCode();//在firefox浏览器中 vercodestyle刚开始是空的！！！
+			produceCode(); //在firefox浏览器中 vercodestyle刚开始是空的！！！
 		} else { //其他情况下不产生验证码，只是对验证码对错进行验证
 			if(vercodeSpan.style.color == "red") { //如果验证码不正确，根据提示语句的颜色来确认是否正确
 				vercodeSpan.style.color = "red"; //单独设置样式
@@ -269,6 +284,19 @@ var usernamenum = 0,
 	phonenum = 0,
 	vercodenum = 0;
 
+function checkUsername(userName) {//传来的是key，不是value 如要查找：majialong 传来的是majialongusername 
+	var cookie = unescape(document.cookie); //得到cookie
+	var cookieArray = cookie.split(";"); //以；分组得到一个数组
+	for(var i = 0; i < cookieArray.length; i++) { //步进值为4，直接跳转到uesername一项中
+		var value = cookieArray[i].split("=")[0]; //再次以=分组直接,得到此时的key，不能得到value，因为密码的值可能于此冲突
+		//alert(value);
+		if(userName == value) { //如果此时的值与用户输入的值相同返回0
+			return 0; //如果有存在的直接返回0 
+		}
+	}
+	return 1; //如果不存在的话返回1
+}
+
 function submit() { //对提交按钮进行设置
 	var submit = document.getElementById("submit");
 	var username = document.getElementById("username");
@@ -281,11 +309,39 @@ function submit() { //对提交按钮进行设置
 		if(usernamenum && passwordnum && repasswordnum && mailboxnum && phonenum && vercodenum) { //如果各项内容都填写正确，写入cookie
 			var date = new Date(); //新建一个时间类
 			date.setDate(date.getDate() + 30); //设置时间 为 当前日期加上30天
-			var cookie = "username=" + username.value + ";password=" + password.value + ";mailbox=" + mailbox.value + ";phone=" + phone.value; //对注册信息进行保存
-			document.cookie = escape(cookie); //进行编码
+			var tempCookie = "";
+			var cookie1 = unescape(document.cookie);//得到cookie的值
+			var cookieArray = cookie1.split(";");
+			if(cookieArray.length%4==2 || cookieArray.length%4==3) {
+				if(cookieArray.length%4==2) {
+					for(var i=0;i<cookieArray.length-1;i++) {
+						if(cookieArray[i] != "") {//字符串不为空
+							tempCookie += cookieArray[i];
+							tempCookie += ";";
+						}
+					}
+				}
+				if(cookieArray.length%4==3) {
+					for(var i=0;i<cookieArray.length-2;i++) {
+						if(cookieArray[i] != "") {//字符串不为空
+							tempCookie += cookieArray[i];
+							tempCookie += ";";
+						}	
+					}
+				}
+			}
+			//var tempCookie = unescape(document.cookie);//先将cookie保留下来
+			document.cookie = "";//将cookie设为空的
+			//alert(tempCookie);
+			cookie = username.value + "username" + "=" + username.value + ";" + username.value + "password" + "=" + password.value + ";" + username.value + "mailbox" + "=" + mailbox.value + ";" + username.value + "phone" + "=" + phone.value + ";" + tempCookie;
+			document.cookie = escape(cookie);
+			//将新的内容写入带最前面，
+			//不编码的话只会长时间保存第一个内容
 			document.cookie = document.cookie + ";expires=" + date.toGMTString(); //加上保存的时间
 			alert("注册完成！");
-			return false;
+			//var a = unescape(document.cookie);
+			//alert(a);
+			return false;//取消浏览器默认刷新行为
 		} else { //否则对填写错误的那项进行聚焦，来提示错误
 			if(!usernamenum) {
 				username.onfocus();
