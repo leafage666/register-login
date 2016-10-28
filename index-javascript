@@ -1,3 +1,5 @@
+var usernameValue;
+
 function getCookie(cookieName) {
 	var cookie = unescape(document.cookie); //得到解码后的cookie
 	var cookieArray = cookie.split(";"); //第一次分组
@@ -47,6 +49,7 @@ function visitor() {
 
 
 function user() {
+	visitor();
 	var div1 = document.createElement("div");//新建一个div1
 	div1.setAttribute("id","myDiv1");//设置id
 	var img = document.createElement("img");//新建图片节点
@@ -71,7 +74,7 @@ function user() {
 	var username_text = document.createTextNode("用户：");//设置表格文本
 	usernameTd1.appendChild(username_text);//将文本插入到表格中
 	var usernameTd2 = document.createElement("td");//再创建一列表格 用来存放值
-	var username_value = document.createTextNode(getCookie("username"));//从cookie中得到想要的值
+	var username_value = document.createTextNode(getCookie(usernameValue + "username"));//从cookie中得到想要的值
 	usernameTd2.appendChild(username_value);//将值插入到表格中
 	usernameTr.appendChild(usernameTd1);
 	usernameTr.appendChild(usernameTd2);//依次插入到表格tr中
@@ -82,7 +85,7 @@ function user() {
 	var password_text = document.createTextNode("用户：");//设置表格文本
 	passwordTd1.appendChild(password_text);//将文本插入到表格中
 	var passwordTd2 = document.createElement("td");//再创建一列表格 用来存放值
-	var password_value = document.createTextNode(getCookie("password"));//从cookie中得到想要的值
+	var password_value = document.createTextNode(getCookie(usernameValue + "password"));//从cookie中得到想要的值
 	passwordTd2.appendChild(password_value);//将值插入到表格中
 	passwordTr.appendChild(passwordTd1);
 	passwordTr.appendChild(passwordTd2);//依次插入到表格tr中
@@ -93,7 +96,7 @@ function user() {
 	var mailbox_text = document.createTextNode("用户：");//设置表格文本
 	mailboxTd1.appendChild(mailbox_text);//将文本插入到表格中
 	var mailboxTd2 = document.createElement("td");//再创建一列表格 用来存放值
-	var mailbox_value = document.createTextNode(getCookie("mailbox"));//从cookie中得到想要的值
+	var mailbox_value = document.createTextNode(getCookie(usernameValue + "mailbox"));//从cookie中得到想要的值
 	mailboxTd2.appendChild(mailbox_value);//将值插入到表格中
 	mailboxTr.appendChild(mailboxTd1);
 	mailboxTr.appendChild(mailboxTd2);//依次插入到表格tr中
@@ -104,7 +107,7 @@ function user() {
 	var phone_text = document.createTextNode("用户：");//设置表格文本
 	phoneTd1.appendChild(phone_text);//将文本插入到表格中
 	var phoneTd2 = document.createElement("td");//再创建一列表格 用来存放值
-	var phone_value = document.createTextNode(getCookie("phone"));//从cookie中得到想要的值
+	var phone_value = document.createTextNode(getCookie(usernameValue + "phone"));//从cookie中得到想要的值
 	phoneTd2.appendChild(phone_value);//将值插入到表格中
 	phoneTr.appendChild(phoneTd1);
 	phoneTr.appendChild(phoneTd2);//依次插入到表格tr中
@@ -113,10 +116,23 @@ function user() {
 
 window.onload = function() {
 	var ID = getCookie(" ID"); //得到ID的身份
+	if(ID == undefined) {//IE浏览器前面没有空格
+		var ID = getCookie("ID");
+	}
+	var login = getCookie(" login");//得到此时是哪个用户登录的
+	if(login == undefined) {
+		var login = getCookie("login");
+	}
 	if(ID == 1) { //如果是用户，加载用户界面
+		usernameValue = getCookie(login + "username");
+		//alert(usernameValue);
 		user();
 	}
 	if(ID == 0) {
 		visitor()//如果是游客，加载游客界面
 	}
+	if(document.cookie == "") {//如果第一次直接点击游客登录的话，不写入内容
+		visitor();
+	}
+	
 }
