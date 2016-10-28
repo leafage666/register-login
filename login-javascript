@@ -18,7 +18,7 @@ function changeFailingStyle(nameID, spanID) { //输入失败时但是焦点还�
 	nameID.style.borderColor = "red";
 }
 
-function getCookie(cookieName) {
+function getCookie(username) {//传来的是key，返回的是对应的value
 	var cookie = unescape(document.cookie); //得到解码后的cookie
 	//var complie = cookieName + "=" + "(.+?);"; //编写正则表达式
 	//var pattern = new RegExp(complie);
@@ -26,11 +26,12 @@ function getCookie(cookieName) {
 	var cookieArray = cookie.split(";"); //第一次分组
 	for(var i = 0; i < cookieArray.length; i++) { //循环分组里面的内容
 		var value = cookieArray[i].split("="); //第二次分组
-		if(value[0] == cookieName) { //如果匹配到所要求而的内容
+		if(value[0] == username) { //如果匹配到所要求而的内容
 			return value[1]; //返回值
 		}
 	}
 }
+
 
 function vercode() {
 	var vercode = document.getElementById("vercode");
@@ -42,8 +43,8 @@ function vercode() {
 			if(vercodeSpan.style.color == "red") { //如果验证码不正确，根据提示语句的颜色来确认是否正确
 				vercodeSpan.style.color = "red"; //单独设置样式
 				vercode.style.borderColor = "red";
-			} else {//在chrome不需要  在ie中需要  输入完验证码 再输入密码自动跳转时
-				changeSucceedStyle(vercode,vercodeSpan);
+			} else { //在chrome不需要  在ie中需要  输入完验证码 再输入密码自动跳转时
+				changeSucceedStyle(vercode, vercodeSpan);
 			}
 		}
 	}
@@ -97,9 +98,10 @@ function vercode() {
 function username() {
 	var username = document.getElementById("username"); //得到账户的对象
 	var usernameSpan = document.getElementById("usernameSpan"); //得到文本对象
-	var usernameCookie = getCookie("username"); //得到cookie中保存的值
+	var usernameCookie;
 	var password = document.getElementById("password");
 	username.onfocus = function() { //获得焦点时根据匹配成功与否修改span中的样式和内容
+		usernameCookie = getCookie(username.value + "username");
 		if(!(username.value == usernameCookie)) { //如果获得焦点时输入不正确，重新调整样式
 			usernameSpan.firstChild.nodeValue = "账户不存在"; //修改提示语句
 			changeFailingStyle(username, usernameSpan); //修改为匹配中并且失败的样式
@@ -109,6 +111,7 @@ function username() {
 		}
 	}
 	username.onkeyup = function() { //输入内容是判断根据输入的值修改span中的样式和内容,使用up不是down，因为down读取时候有出入
+		usernameCookie = getCookie(username.value + "username");
 		if(username.value == usernameCookie) { //匹配成功的话
 			changeSucceedStyle(username, usernameSpan); //修改为匹配成功的样式
 			password.focus(); //输入正确的话直接换行
@@ -124,7 +127,7 @@ function username() {
 		}
 	}
 	username.onblur = function() { //失去焦点时根据匹配成功与否修改span中的样式和内容
-
+		//usernameCookie = getCookie(username.value + "username");
 		if(username.value == usernameCookie) { //匹配成功的话
 			changeSucceedStyle(username, usernameSpan); //修改为成功的样式
 			usernamenum = 1;
@@ -138,11 +141,16 @@ function username() {
 function password() {
 	var password = document.getElementById("password"); //得到账户的对象
 	var passwordSpan = document.getElementById("passwordSpan"); //得到文本对象
-	var passwordCookie = getCookie("password"); //得到密码cookie中保存的值
-	var usernameCookie = getCookie("username"); //得到账户的cookie的值
 	var username = document.getElementById("username"); //得到用户所输入的账户
 	var vercode = document.getElementById("vercode");
+	
+	var usernameCookie; //= getCookie(username.value + "username");//用来得到此时的用户名，防止再次修改用户名造成错误
+	var passwordCookie; //= getCookie(username.value + "password");//用来查找此时输入的用户名对应的密码
+
 	password.onfocus = function() { //获得焦点时根据匹配成功与否修改span中的样式和内容
+		//再次得到密码和用户名，防止填写完密码后修改用户名导致用户名和密码不一致
+		usernameCookie = getCookie(username.value + "username");//此时得到cookie中对应用户的账号
+		passwordCookie = getCookie(username.value + "password");//得到对应用户的密码
 		if(!(password.value == passwordCookie) || !(username.value == usernameCookie)) { //如果获得焦点时输入不正确，重新调整样式
 			passwordSpan.firstChild.nodeValue = "密码错误"; //修改提示语句
 			changeFailingStyle(password, passwordSpan); //修改为匹配中并且失败的样式
@@ -151,6 +159,8 @@ function password() {
 		}
 	}
 	password.onkeyup = function() { //输入内容是判断根据输入的值修改span中的样式和内容,使用up不是down，因为down读取时候有出入
+		usernameCookie = getCookie(username.value + "username");//此时得到cookie中对应用户的账号
+		passwordCookie = getCookie(username.value + "password");//得到对应用户的密码
 		if(password.value == passwordCookie && username.value == usernameCookie) { //如果密码等于cookie的值，并且用户输入的账户与cookie的值一致时
 			changeSucceedStyle(password, passwordSpan); //修改为匹配成功的样式
 			vercode.focus(); //输入正确的话直接换行
@@ -160,6 +170,8 @@ function password() {
 		}
 	}
 	password.onblur = function() { //失去焦点时根据匹配成功与否修改span中的样式和内容
+		//usernameCookie = getCookie(username.value + "username");
+		//passwordCookie = getCookie(username.value + "password");
 		if(password.value == passwordCookie && username.value == usernameCookie) { //匹配成功的话
 			changeSucceedStyle(password, passwordSpan); //修改为成功的样式
 			passwordnum = 1;
@@ -176,9 +188,11 @@ var usernamenum = 0,
 
 function user() {
 	var user = document.getElementById("user");
+	var username = document.getElementById("username");
 	user.onclick = function() {
 		if(usernamenum && passwordnum && vercodenum) {
-			document.cookie = "ID=1"; //代表用户登录
+			document.cookie = "ID=1;"; //代表用户登录
+			document.cookie = "login=" + username.value;
 			location.href = "index.html";
 		} else {
 			alert("请确认填写的信息全部正确！");
@@ -190,7 +204,9 @@ function user() {
 function visitor() {
 	var visitor = document.getElementById("visitor");
 	visitor.onclick = function() {
-		document.cookie = "ID=0"; //代表游客登录
+		if(document.cookie != "") {//如果此时cookie为空的话，不进行保存cookie，否则ID不会在最后面一项
+			document.cookie = "ID=0;"; //代表游客登录
+		}
 		location.href = "index.html";
 	}
 }
@@ -203,4 +219,6 @@ window.onload = function() {
 	visitor();
 	var Username = document.getElementById("username");
 	Username.onfocus();
+	//var a = unescape(document.cookie);
+			//alert(a);
 }
