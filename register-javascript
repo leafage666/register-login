@@ -313,6 +313,14 @@ function submit() { //对提交按钮进行设置
 			var cookie1 = unescape(document.cookie);//得到cookie的值
 			var cookieArray = cookie1.split(";");
 			if(cookieArray.length%4==2 || cookieArray.length%4==3) {
+                                if(cookieArray.length%4==1) {
+					for(var i=0;i<cookieArray.length-1;i++) {
+						if(cookieArray[i] != "") {//字符串不为空
+							tempCookie += cookieArray[i];
+							tempCookie += ";";
+						}
+					}
+				}
 				if(cookieArray.length%4==2) {
 					for(var i=0;i<cookieArray.length-1;i++) {
 						if(cookieArray[i] != "") {//字符串不为空
